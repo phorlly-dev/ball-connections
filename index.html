@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css">
+    <title>Ball Connections</title>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <button class="btn home-btn">🏠</button>
+            <h1 class="level-title">Level <span id="title">1</span></h1>
+            <button class="btn settings-btn">⚙️</button>
+        </div>
+
+        <div class="level-info">Draw curved lines • Connect same colors • <span id="subtile">3</span> colors</div>
+
+        <div id="phaser-game"></div>
+
+        <div class="controls">
+            <button class="control-btn reset-btn" id="reset-btn">Reset</button>
+            <button class="control-btn hint-btn" id="hint-btn">Hint</button>
+        </div>
+
+        <div id="status" class="status">Connect the matching colors!</div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+</body>
+
+</html>

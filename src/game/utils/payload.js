@@ -1,4 +1,5 @@
 import Instances from "../consts";
+import Helpers from "./helper";
 import States from "./state";
 
 const Payloads = {
@@ -38,7 +39,7 @@ const Payloads = {
             scene.balls.push(ballContainer);
         });
 
-        States.setStatus("Connect the matching colors!");
+        States.setStatus(Instances.text.status);
     },
     generateLevelConfig(scene, level) {
         const gameWidth = scene.sys.game.config.width;
@@ -51,7 +52,7 @@ const Payloads = {
         // Balls per color also increases with levels (max 4 per color)
         const ballsPerColor = Math.min(2 + Math.floor(level / 20), 4);
 
-        const totalBalls = numColors * ballsPerColor;
+        scene.totalBalls = numColors * ballsPerColor;
         const minDistance = scene.ballRadius * 3 + 5;
         const margin = scene.ballRadius * 2;
 
@@ -67,7 +68,7 @@ const Payloads = {
             attempts = 0;
 
             // random positions with spacing
-            while (positions.length < totalBalls && attempts < 2000) {
+            while (positions.length < scene.totalBalls && attempts < 2000) {
                 const x = Phaser.Math.Between(margin, gameWidth - margin);
                 const y = Phaser.Math.Between(margin, gameHeight - margin);
 
@@ -116,35 +117,28 @@ const Payloads = {
                     });
                 }
             }
-        } while (ballConfig.length < totalBalls || this.isTooEasy(ballConfig));
+        } while (ballConfig.length < scene.totalBalls || Helpers.isTooEasy(ballConfig));
 
         return { balls: ballConfig };
     },
     checkCompletion(scene, { startBall, endBall, color }) {
         if (scene.balls.every((ball) => ball.connected)) {
             States.setStatus(`🎉 Level ${scene.currentLevel} Complete!`, "completed");
+            Helpers.playSound(scene, Instances.audio.key.win);
             States.playLevelCompleteEffect(scene, scene.currentLevel);
+            Helpers.setOrCutScore(scene, scene.totalBalls);
             States.setDelay({ scene, callback: () => this.initLevel(scene, scene.currentLevel + 1) });
         } else {
             States.setStatus("✅ Great connection!");
+            Helpers.setOrCutScore(scene, scene.totalBalls);
+            Helpers.playSound(scene, Instances.audio.key.connect);
             States.playConnectEffect(scene, { startBall, endBall, color });
-            States.setDelay({ scene, callback: () => States.setStatus("Connect the matching colors!") });
         }
     },
     drawAllPaths(scene) {
         scene.lineGraphics.clear();
         const allPaths = scene.currentPath ? [...scene.paths, scene.currentPath] : scene.paths;
-        allPaths.forEach((path) => this.drawPath(scene, path));
-    },
-    drawPath(scene, path) {
-        if (path.points.length < 2) return;
-
-        // Outer base
-        scene.lineGraphics.lineStyle(18, path.color, 0.35).strokePoints(path.points);
-        // Middle tube
-        scene.lineGraphics.lineStyle(10, path.color, 1).strokePoints(path.points);
-        // Inner highlight
-        scene.lineGraphics.lineStyle(4, 0xffffff, 0.8).strokePoints(path.points);
+        allPaths.forEach((path) => Helpers.drawPath(scene, path));
     },
     getBallAt(scene, x, y) {
         return scene.balls.find((ball) => Phaser.Math.Distance.Between(x, y, ball.x, ball.y) < scene.ballRadius);
@@ -152,64 +146,39 @@ const Payloads = {
     updateBallStyle(ball) {
         ball.mainCircle.setStrokeStyle(ball.connected ? 4 : 3, ball.connected ? 0x2c3e50 : 0xbdc3c7);
     },
-    cancelCurrentPath(scene, message) {
-        States.setStatus(message, "error");
+    toggleUI(isVisible = true) {
+        const header = States.getById("header");
+        const controls = States.getById("controls");
+        const levelInfo = States.getById("level-info");
+        const status = States.getById("status");
 
-        // Remove current path instantly
-        scene.isDragging = false;
-        scene.currentPath = null;
-
-        // clear graphics and redraw ONLY confirmed paths
-        scene.lineGraphics.clear();
-        scene.paths.forEach((path) => {
-            if (path.completed) {
-                // redraw completed paths only
-                this.drawPath(scene, path);
-            }
-        });
-
-        States.setDelay({ scene, delay: 5000, callback: () => States.setStatus("Connect the matching colors!") });
-    },
-    isTooEasy(config) {
-        // heuristic: if all same-color pairs are too close (< 120 px) → reject
-        for (let i = 0; i < config.length; i++) {
-            for (let j = i + 1; j < config.length; j++) {
-                if (config[i].color === config[j].color) {
-                    const dist = Phaser.Math.Distance.Between(config[i].x, config[i].y, config[j].x, config[j].y);
-                    if (dist < 150) return true;
-                }
-            }
+        if (isVisible) {
+            Helpers.show({ element: header });
+            Helpers.show({ element: controls });
+            Helpers.show({ element: levelInfo });
+            Helpers.show({ element: status });
+        } else {
+            Helpers.hide({ element: header });
+            Helpers.hide({ element: controls });
+            Helpers.hide({ element: levelInfo });
+            Helpers.hide({ element: status });
         }
-        return false;
     },
-    disconnectPath(scene, ball) {
-        // Find its path
-        const pathIndex = this.paths.findIndex(
-            (p) => p.startBall.colorKey === ball.colorKey || (p.endBall && p.endBall.colorKey === ball.colorKey)
-        );
+    toggleSound(scene) {
+        // Start with muted = false
+        scene.sound.mute = false;
+        Helpers.playSound(scene, Instances.audio.key.click);
 
-        if (pathIndex !== -1) {
-            const path = this.paths[pathIndex];
-
-            // Reset both balls
-            path.startBall.connected = false;
-            path.startBall.connectedTo = null;
-            this.updateBallStyle(path.startBall);
-
-            if (path.endBall) {
-                path.endBall.connected = false;
-                path.endBall.connectedTo = null;
-                this.updateBallStyle(path.endBall);
-            }
-
-            // Remove the path
-            scene.paths.splice(pathIndex, 1);
-
-            // Redraw
-            scene.lineGraphics.clear();
-            this.drawAllPaths(scene);
-
-            States.setStatus("🔄 Connection removed!");
+        if (scene.sound.mute) {
+            // Unmute
+            scene.sound.mute = false;
+            Helpers.show({ element: scene.onBtn });
+            Helpers.hide({ element: scene.offBtn });
+        } else {
+            // Mute
+            scene.sound.mute = true;
+            Helpers.hide({ element: scene.onBtn });
+            Helpers.show({ element: scene.offBtn });
         }
     },
 };

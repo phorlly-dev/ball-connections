@@ -2,80 +2,93 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: "Arial", sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
 }
 
+#phaser-game {
+    width: 100%;
+    height: auto;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
 .game-container {
-    background: white;
+    background: #f3eeecea;
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(15, 1, 1, 1);
     text-align: center;
     max-width: 450px;
+    min-width: 300px;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #d6c8c8ff 0%, #f1f3f6 100%);
+    border-radius: 12px;
+    padding: 10px 15px;
+    margin: 12px;
+    box-shadow: 0 15px 35px rgba(185, 163, 163, 1);
 }
 
-.btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 15px;
-    border: none;
+.high {
     font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-weight: "bold";
+}
+
+.header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 10px;
+    font-family: "Press Start 2P", cursive;
+}
+
+.header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: "Courier New", Courier, monospace;
+    color: #27ae60;
+    margin: 0 6px;
 }
 
 #subtile {
     font-size: 18px;
     font-weight: bold;
     color: #333;
-    margin: 0;
-}
-
-.home-btn {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
-
-.settings-btn {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
-}
-
-.level-title {
-    font-size: 32px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
 }
 
 /* This div will hold the Phaser game canvas */
 #phaser-game canvas {
-    border: 3px solid #ddd;
-    background: "#f8f9fa";
-    border-radius: 16px;
-    overflow: hidden; /* Ensures canvas stays within the rounded border */
+    border: 4px solid #eca7a7ff;
+    background: #f8f9fa;
+    border-radius: 20px;
+    overflow: hidden;
     cursor: crosshair;
     margin: 10px;
+    box-shadow: 0 15px 35px rgba(211, 166, 166, 1);
 }
 
 .controls {
     margin-top: 20px;
     display: flex;
-    gap: 10px;
     justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8f2f2ff 0%, #f1f3f6 100%);
+    padding: 10px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 15px 35px rgba(143, 129, 129, 1);
 }
 
 .control-btn {
@@ -85,6 +98,7 @@ body {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+    margin: 0 10px;
     transition: transform 0.1s;
 }
 
@@ -94,12 +108,10 @@ body {
 
 .reset-btn {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    color: white;
 }
 
 .hint-btn {
     background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
-    color: white;
 }
 
 .status {
@@ -115,4 +127,45 @@ body {
 }
 .error {
     color: #e74c3c;
+}
+
+/* Smooth show/hide */
+.hidden {
+    display: none !important;
+}
+
+/* =======================
+   BUTTONS
+======================= */
+.control-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Specific colors */
+.control-btn.volume {
+    background: #27ae60;
+} /* green */
+.control-btn.volume.muted {
+    background: #c0392b;
+} /* muted red */
+/* States */
+
+.control-btn:hover {
+    transform: translateY(-2px);
+}
+
+.control-btn:active {
+    transform: translateY(1px);
 }

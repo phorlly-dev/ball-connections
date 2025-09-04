@@ -1,8 +1,42 @@
 const Instances = {
     game: {
         width: 400,
-        height: 400,
+        height: 420,
         bg: "#f8f9fa",
+    },
+    text: {
+        status: "Draw flexible lines to connect same colors!",
+        hintText: "💡 Connect pairs without crossing lines or other balls.",
+    },
+    image: {
+        key: {
+            bg: "background",
+            logo: "logo",
+        },
+        value: {
+            bg: "images/bg.png",
+            logo: "images/logo.png",
+        },
+    },
+    audio: {
+        key: {
+            bg: "bg-music",
+            connect: "connect",
+            cancel: "cancel",
+            click: "click",
+            empty: "empty",
+            win: "win",
+            wrong: "wrong",
+        },
+        value: {
+            bg: "audios/bg_music.ogg",
+            connect: "audios/connect.ogg",
+            cancel: "audios/cancel.ogg",
+            click: "audios/click.mp3",
+            empty: "audios/empty.ogg",
+            win: "audios/win.ogg",
+            wrong: "audios/wrong.wav",
+        },
     },
     colors: [
         { key: "red", hex: 0xe74c3c },

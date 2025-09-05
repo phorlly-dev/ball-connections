@@ -8,13 +8,15 @@ class Preload extends Phaser.Scene {
 
     preload() {
         // background image (optional)
-        this.add.image(Instances.game.width / 2, Instances.game.height / 2, Instances.image.key.bg).setAlpha(0.6);
+        const bg = this.add
+            .image(Instances.game.width / 2, Instances.game.height / 2, Instances.image.key.bg)
+            .setAlpha(0.6);
         Payloads.toggleUI(false);
 
         // sizes
         const barWidth = 240;
         const barHeight = 28;
-        const radius = 8;
+        const radius = 12;
         const barX = Instances.game.width / 2 - barWidth / 2;
         const barY = Instances.game.height / 2;
 
@@ -36,7 +38,7 @@ class Preload extends Phaser.Scene {
 
         // fake tween smoothing
         this.fakeProgress = 0;
-        this.speed = 1200; // ms tween speed
+        this.speed = 800; // ms tween speed
 
         this.load.on("progress", (progress) => {
             this.currentTween = this.tweens.add({
@@ -56,6 +58,11 @@ class Preload extends Phaser.Scene {
 
         this.load.on("complete", () => {
             this.time.delayedCall(this.speed, () => {
+                this.currentTween.stop();
+                bg.destroy();
+                progressBox.destroy();
+                progressBar.destroy();
+                progressText.destroy();
                 this.scene.start("GameEngine");
             });
         });

@@ -101,6 +101,12 @@ const Helpers = {
 
         States.setPoints(scene.currentScore);
     },
+    toggleDrawingCursor(enable) {
+        const cursor = States.getById("phaser-game").classList;
+
+        enable ? cursor.add("drawing") : cursor.remove("drawing");
+        // gameDiv.classList.toggle("drawing", enable);
+    },
 };
 
 export default Helpers;

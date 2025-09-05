@@ -21,6 +21,7 @@ const Payloads = {
             const ballContainer = scene.add
                 .container(config.x, config.y)
                 .setSize(scene.ballRadius * 2, scene.ballRadius * 2)
+                .setScale(0.8)
                 .setInteractive();
 
             const mainCircle = scene.add
@@ -42,8 +43,8 @@ const Payloads = {
         States.setStatus(Instances.text.status);
     },
     generateLevelConfig(scene, level) {
-        const gameWidth = scene.sys.game.config.width;
-        const gameHeight = scene.sys.game.config.height;
+        const gameWidth = scene.scale.width;
+        const gameHeight = scene.scale.height;
 
         // Increase difficulty by adding more colors over time
         const numColors = Math.min(3 + Math.floor(level / 10), Instances.colors.length);
@@ -148,20 +149,14 @@ const Payloads = {
     },
     toggleUI(isVisible = true) {
         const header = States.getById("header");
-        const controls = States.getById("controls");
-        const levelInfo = States.getById("level-info");
-        const status = States.getById("status");
+        const footer = States.getById("footer");
 
         if (isVisible) {
             Helpers.show({ element: header });
-            Helpers.show({ element: controls });
-            Helpers.show({ element: levelInfo });
-            Helpers.show({ element: status });
+            Helpers.show({ element: footer });
         } else {
             Helpers.hide({ element: header });
-            Helpers.hide({ element: controls });
-            Helpers.hide({ element: levelInfo });
-            Helpers.hide({ element: status });
+            Helpers.hide({ element: footer });
         }
     },
     toggleSound(scene) {

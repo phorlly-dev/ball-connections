@@ -30,6 +30,7 @@ const Controllers = {
         });
     },
     handlePointerUp(scene, pointer) {
+        Helpers.toggleDrawingCursor(false);
         if (!scene.isDragging || !scene.currentPath) return;
 
         scene.isDragging = false;
@@ -135,6 +136,7 @@ const Controllers = {
         Payloads.drawAllPaths(scene);
     },
     handlePointerDown(scene, pointer) {
+        Helpers.toggleDrawingCursor(true);
         const clickedBall = Payloads.getBallAt(scene, pointer.x, pointer.y);
         if (!clickedBall) return;
 

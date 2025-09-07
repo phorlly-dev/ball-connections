@@ -6,11 +6,12 @@ import Preload from "./scenes/Preload";
 
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
+const { width, height, bg } = Instances.game;
 const config = {
     type: Phaser.AUTO,
-    width: Instances.game.width,
-    height: Instances.game.height,
-    backgroundColor: Instances.game.bg,
+    width: width,
+    height: height,
+    backgroundColor: bg,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,

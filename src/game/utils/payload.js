@@ -2,6 +2,9 @@ import Instances from "../consts";
 import Helpers from "./helper";
 import States from "./state";
 
+const { status } = Instances.text;
+const { click, connect, win } = Instances.audio.key;
+const { colors } = Instances;
 const Payloads = {
     initLevel(scene, level) {
         scene.currentLevel = level;
@@ -17,7 +20,7 @@ const Payloads = {
         const levelConfig = this.generateLevelConfig(scene, level);
 
         levelConfig.balls.forEach((config) => {
-            const colorInfo = Instances.colors.find((c) => c.key === config.color);
+            const colorInfo = colors.find((c) => c.key === config.color);
             const ballContainer = scene.add
                 .container(config.x, config.y)
                 .setSize(scene.ballRadius * 2, scene.ballRadius * 2)
@@ -40,14 +43,14 @@ const Payloads = {
             scene.balls.push(ballContainer);
         });
 
-        States.setStatus(Instances.text.status);
+        States.setStatus(status);
     },
     generateLevelConfig(scene, level) {
         const gameWidth = scene.scale.width;
         const gameHeight = scene.scale.height;
 
         // Increase difficulty by adding more colors over time
-        const numColors = Math.min(3 + Math.floor(level / 10), Instances.colors.length);
+        const numColors = Math.min(3 + Math.floor(level / 10), colors.length);
         States.setSubtitle(numColors);
 
         // Balls per color also increases with levels (max 4 per color)
@@ -87,7 +90,7 @@ const Payloads = {
 
             // assign colors
             ballConfig = [];
-            const availableColors = [...Instances.colors];
+            const availableColors = [...colors];
             Phaser.Utils.Array.Shuffle(positions);
 
             for (let i = 0; i < numColors; i++) {
@@ -125,14 +128,14 @@ const Payloads = {
     checkCompletion(scene, { startBall, endBall, color }) {
         if (scene.balls.every((ball) => ball.connected)) {
             States.setStatus(`🎉 Level ${scene.currentLevel} Complete!`, "completed");
-            Helpers.playSound(scene, Instances.audio.key.win);
+            Helpers.playSound(scene, win);
             States.playLevelCompleteEffect(scene, scene.currentLevel);
             Helpers.setOrCutScore(scene, scene.totalBalls);
             States.setDelay({ scene, callback: () => this.initLevel(scene, scene.currentLevel + 1) });
         } else {
             States.setStatus("✅ Great connection!");
             Helpers.setOrCutScore(scene, scene.totalBalls);
-            Helpers.playSound(scene, Instances.audio.key.connect);
+            Helpers.playSound(scene, connect);
             States.playConnectEffect(scene, { startBall, endBall, color });
         }
     },
@@ -162,7 +165,7 @@ const Payloads = {
     toggleSound(scene) {
         // Start with muted = false
         scene.sound.mute = false;
-        Helpers.playSound(scene, Instances.audio.key.click);
+        Helpers.playSound(scene, click);
 
         if (scene.sound.mute) {
             // Unmute

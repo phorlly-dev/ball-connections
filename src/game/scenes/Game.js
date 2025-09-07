@@ -5,10 +5,28 @@ import Payloads from "../utils/payload";
 class GameEngine extends Phaser.Scene {
     constructor() {
         super("GameEngine");
+
+        // Declare properties
+        this.balls = [];
+        this.paths = [];
+        this.currentPath = null;
+        this.isDragging = false;
+        this.ballRadius = 25;
+        this.currentLevel = 1;
+        this.currentScore = 0;
+
+        this.lineGraphics = null;
+
+        this.onBtn = null;
+        this.offBtn = null;
+        this.resetBtn = null;
+        this.hintBtn = null;
     }
 
     init() {
         Payloads.toggleUI();
+
+        // Reset state each time scene starts
         this.balls = [];
         this.paths = [];
         this.currentPath = null;
@@ -19,24 +37,26 @@ class GameEngine extends Phaser.Scene {
     }
 
     create() {
-        // Graphics object for drawing all lines
+        // --- Graphics object for lines ---
         this.lineGraphics = this.add.graphics();
-        Payloads.initLevel(this, this.currentLevel);
-        Controllers.buttons(this);
-        Controllers.toggleMote(this);
-        this.sound.play(Instances.audio.key.bg, { loop: true, volume: 0.5 });
-    }
-    update() {
-        this.setupInputListeners();
-    }
 
-    // --- INPUT HANDLING ---
-    setupInputListeners() {
+        // --- Setup game level ---
+        Payloads.initLevel(this, this.currentLevel);
+
+        // --- Controllers / UI ---
+        Controllers.buttons(this);
+        Controllers.toggleMute?.(this); // safer check if function exists
+
+        // --- Audio ---
+        this.sound.play(Instances.audio.key.bg, { loop: true, volume: 0.5 });
+
+        // --- Input listeners (once, not per frame) ---
         this.input.on("pointerdown", this.handlePointerDown, this);
         this.input.on("pointermove", this.handlePointerMove, this);
         this.input.on("pointerup", this.handlePointerUp, this);
     }
 
+    // --- INPUT HANDLING ---
     handlePointerDown(pointer) {
         Controllers.handlePointerDown(this, pointer);
     }
@@ -47,6 +67,13 @@ class GameEngine extends Phaser.Scene {
 
     handlePointerUp(pointer) {
         Controllers.handlePointerUp(this, pointer);
+    }
+
+    // --- Cleanup when scene stops ---
+    shutdown() {
+        this.input.removeAllListeners();
+        this.sound.stopAll();
+        if (this.lineGraphics) this.lineGraphics.clear();
     }
 }
 

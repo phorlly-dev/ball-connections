@@ -60,7 +60,7 @@ body {
     color: #333;
 }
 
-#phaser-wrapper {
+.phaser-wrapper {
     border-radius: 20px;
     border: 4px solid #eca7a7ff;
     overflow: hidden; /* 👈 ensures canvas respects rounding */

@@ -1,53 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="stylesheet" href="/style.css" />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-        />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-        <title>Ball Connections</title>
-    </head>
 
-    <body>
-        <div class="game-container">
-            <div class="header hidden" id="header">
-                <h2>Score: <span class="high title" id="score">0</span></h2>
-                <h1>Level <span class="high title" id="title">1</span></h1>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <title>Ball Connections</title>
+</head>
 
-                <button id="on-btn" class="control-btn volume">
-                    <i class="fa fa-volume-up" aria-hidden="true"></i>
-                </button>
-                <button id="off-btn" class="control-btn volume muted hidden">
-                    <i class="fa fa-volume-mute" aria-hidden="true"></i>
-                </button>
-            </div>
+<body>
+    <div class="game-container">
+        <div class="header hidden" id="header">
+            <h2>Score: <span class="high title" id="score">0</span></h2>
+            <h1>Level <span class="high title" id="title">1</span></h1>
 
-            <div id="phaser-wrapper">
-                <div id="phaser-game"></div>
-            </div>
-
-            <div class="game-footer hidden" id="footer">
-                <div id="level-info" class="title">
-                    Draw curved lines • Connect same colors • <span id="subtile">3</span> colors
-                </div>
-
-                <div class="controls">
-                    <button id="hint-btn" class="control-btn hint-btn">
-                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                    </button>
-                    <button id="reset-btn" class="control-btn reset-btn">
-                        <i class="fa fa-refresh" aria-hidden="true"></i>
-                    </button>
-                </div>
-
-                <div id="status" class="status title">Draw flexible lines to connect same colors!</div>
-            </div>
+            <button id="on-btn" class="control-btn volume">
+                <i class="fa fa-volume-up" aria-hidden="true"></i>
+            </button>
+            <button id="off-btn" class="control-btn volume muted hidden">
+                <i class="fa fa-volume-mute" aria-hidden="true"></i>
+            </button>
         </div>
-        <script type="module" src="src/main.js"></script>
-    </body>
+
+        <div class="phaser-wrapper">
+            <div id="phaser-game"></div>
+        </div>
+
+        <div class="game-footer hidden" id="footer">
+            <div id="level-info" class="title">
+                Draw curved lines • Connect same colors • <span id="subtile">3</span> colors
+            </div>
+
+            <div class="controls">
+                <button id="hint-btn" class="control-btn hint-btn">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                </button>
+                <button id="reset-btn" class="control-btn reset-btn">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div id="status" class="status title">Draw flexible lines to connect same colors!</div>
+        </div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+</body>
+
 </html>

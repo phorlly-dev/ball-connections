@@ -4,80 +4,103 @@ import Payloads from "../utils/payload";
 class Preload extends Phaser.Scene {
     constructor() {
         super("Preload");
+
+        // Declare props
+        this.fakeProgress = 0;
+        this.targetProgress = 0;
+        this.progressBar = null;
+        this.progressText = null;
+        this.bg = null;
+        this.progressBox = null;
+    }
+
+    init() {
+        // Reset state when scene restarts
+        this.fakeProgress = 0;
+        this.targetProgress = 0;
     }
 
     preload() {
-        // background image (optional)
-        const bg = this.add
-            .image(Instances.game.width / 2, Instances.game.height / 2, Instances.image.key.bg)
-            .setAlpha(0.6);
+        const { width, height } = this.scale;
         Payloads.toggleUI(false);
 
-        // sizes
-        const barWidth = 240;
+        // --- Background ---
+        this.bg = this.add.image(width / 2, height / 2, Instances.image.key.bg).setAlpha(0.2);
+
+        // --- Sizes (responsive bar width = 40% of screen) ---
+        const barWidth = Math.min(300, width * 0.4);
         const barHeight = 28;
         const radius = 12;
-        const barX = Instances.game.width / 2 - barWidth / 2;
-        const barY = Instances.game.height / 2;
+        const x = width / 2 - barWidth / 2;
+        const y = height / 2 - barHeight / 2;
 
-        // progress container (outline)
-        const progressBox = this.add.graphics();
-        progressBox.lineStyle(2, 0xffffff, 1);
-        progressBox.strokeRoundedRect(barX, barY, barWidth, barHeight, radius);
+        // --- Progress outline ---
+        this.progressBox = this.add.graphics();
+        this.progressBox.lineStyle(2, 0xffffff, 1);
+        this.progressBox.strokeRoundedRect(x, y, barWidth, barHeight, radius);
 
-        // progress bar (filled rect)
-        const progressBar = this.add.graphics();
+        // --- Progress bar ---
+        this.progressBar = this.add.graphics();
 
-        // loading text
-        const progressText = this.add
-            .text(Instances.game.width / 2, barY + 50, "Loading: 0%", {
+        // --- Text ---
+        this.progressText = this.add
+            .text(width / 2, y + barHeight + 40, "Loading: 0%", {
                 fontSize: "18px",
-                fill: "#ffffff",
+                fill: "#c7a7a7ff",
             })
             .setOrigin(0.5);
 
-        // fake tween smoothing
-        this.fakeProgress = 0;
-        this.speed = 800; // ms tween speed
+        // --- Loader events ---
+        this.load.on("progress", (p) => {
+            this.targetProgress = p;
+        });
 
-        this.load.on("progress", (progress) => {
-            this.currentTween = this.tweens.add({
-                targets: this,
-                fakeProgress: progress,
-                duration: this.speed,
-                ease: "Linear",
-                onUpdate: () => {
-                    progressBar.clear();
-                    progressBar.fillStyle(0xe67e22, 1); // Changed to red to match the image
-                    progressBar.fillRoundedRect(barX, barY, barWidth * this.fakeProgress, barHeight, radius);
+        this.load.once("complete", () => {
+            this.targetProgress = 1;
 
-                    progressText.setText(`Loading: ${Math.round(this.fakeProgress * 100)}%`);
+            // Fade out everything nicely
+            this.tweens.add({
+                targets: [this.bg, this.progressBox, this.progressBar, this.progressText],
+                alpha: 0,
+                duration: 500,
+                onComplete: () => {
+                    this.scene.start("GameEngine");
                 },
             });
         });
 
-        this.load.on("complete", () => {
-            this.time.delayedCall(this.speed, () => {
-                this.currentTween.stop();
-                bg.destroy();
-                progressBox.destroy();
-                progressBar.destroy();
-                progressText.destroy();
-                this.scene.start("GameEngine");
-            });
-        });
-
-        // 🔹 Example load assets (replace with yours)
+        // --- Example assets ---
+        const { key, value } = Instances.audio;
         this.load.setPath("assets");
-        this.load.audio(Instances.audio.key.bg, Instances.audio.value.bg);
-        this.load.audio(Instances.audio.key.cancel, Instances.audio.value.cancel);
-        this.load.audio(Instances.audio.key.click, Instances.audio.value.click);
-        this.load.audio(Instances.audio.key.connect, Instances.audio.value.connect);
-        this.load.audio(Instances.audio.key.empty, Instances.audio.value.empty);
-        this.load.audio(Instances.audio.key.win, Instances.audio.value.win);
-        this.load.audio(Instances.audio.key.wrong, Instances.audio.value.wrong);
+        this.load.audio(key.bg, value.bg);
+        this.load.audio(key.cancel, value.cancel);
+        this.load.audio(key.click, value.click);
+        this.load.audio(key.connect, value.connect);
+        this.load.audio(key.empty, value.empty);
+        this.load.audio(key.win, value.win);
+        this.load.audio(key.wrong, value.wrong);
+    }
 
-        this.load.start();
+    update() {
+        // Smooth LERP update
+        this.fakeProgress = Phaser.Math.Linear(this.fakeProgress, this.targetProgress, 0.1);
+
+        const { width, height } = this.scale;
+        const barWidth = Math.min(300, width * 0.4);
+        const barHeight = 28;
+        const radius = 12;
+        const x = width / 2 - barWidth / 2;
+        const y = height / 2 - barHeight / 2;
+
+        this.progressBar.clear();
+        this.progressBar.fillStyle(0xe67e22, 1);
+        this.progressBar.fillRoundedRect(x, y, barWidth * this.fakeProgress, barHeight, radius);
+
+        this.progressText.setText(`Loading: ${Math.round(this.fakeProgress * 100)}%`);
+    }
+
+    shutdown() {
+        this.load.removeAllListeners();
     }
 }
 

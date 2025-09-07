@@ -3,26 +3,38 @@ import Helpers from "./helper";
 import Payloads from "./payload";
 import States from "./state";
 
+const { click, empty, wrong } = Instances.audio.key;
+const { status, hintText } = Instances.text;
 const Controllers = {
     buttons(scene) {
-        const resetBtn = States.getById("reset-btn");
-        const hintBtn = States.getById("hint-btn");
+        // clear old listeners before binding new
+        const elements = [
+            States.getById("reset-btn"),
+            States.getById("hint-btn"),
+            States.getById("on-btn"),
+            States.getById("off-btn"),
+        ];
 
-        resetBtn.addEventListener("click", () => {
-            Payloads.initLevel(scene, scene.currentLevel);
-            Helpers.playSound(scene, Instances.audio.key.click);
+        elements.forEach((el) => {
+            el.replaceWith(el.cloneNode(true)); // 🔑 remove old listeners
         });
-        hintBtn.addEventListener("click", () => {
-            States.setStatus(Instances.text.hintText);
-            Helpers.playSound(scene, Instances.audio.key.click);
-            States.setDelay({ scene, callback: () => States.setStatus(Instances.text.status) });
-        });
-    },
-    toggleMote(scene) {
-        // In your scene create/init
+
+        scene.resetBtn = States.getById("reset-btn");
+        scene.hintBtn = States.getById("hint-btn");
         scene.onBtn = States.getById("on-btn");
         scene.offBtn = States.getById("off-btn");
 
+        scene.resetBtn.addEventListener("click", () => {
+            Payloads.initLevel(scene, scene.currentLevel);
+            Helpers.playSound(scene, click);
+        });
+        scene.hintBtn.addEventListener("click", () => {
+            States.setStatus(hintText);
+            Helpers.playSound(scene, click);
+            States.setDelay({ scene, callback: () => States.setStatus(status) });
+        });
+    },
+    toggleMute(scene) {
         States.bindToggleButtons({
             scene,
             elements: [scene.onBtn, scene.offBtn],
@@ -68,7 +80,7 @@ const Controllers = {
         States.setDelay({
             scene,
             delay: 5000,
-            callback: () => States.setStatus(Instances.text.status),
+            callback: () => States.setStatus(status),
         });
     },
     handlePointerMove(scene, pointer) {
@@ -89,7 +101,7 @@ const Controllers = {
             newPoint.y > scene.sys.game.config.height - margin
         ) {
             Helpers.cancelCurrentPath(scene, "❌ Cannot hit the boundary!");
-            Helpers.playSound(scene, Instances.audio.key.empty);
+            Helpers.playSound(scene, empty);
             return; // ⬅️ stop here
         }
 
@@ -108,7 +120,7 @@ const Controllers = {
 
                 if (Phaser.Geom.Intersects.LineToRectangle(newSegment, rect)) {
                     Helpers.cancelCurrentPath(scene, "❌ Cannot cross another path!");
-                    Helpers.playSound(scene, Instances.audio.key.wrong);
+                    Helpers.playSound(scene, wrong);
                     return; // ⬅️ stop here
                 }
             }
@@ -126,7 +138,7 @@ const Controllers = {
             // ❌ Only block if different color and touching
             if (!isPartner && Phaser.Geom.Intersects.LineToCircle(newSegment, ballCircle)) {
                 Helpers.cancelCurrentPath(scene, "❌ Cannot pass through a different-colored ball!");
-                Helpers.playSound(scene, Instances.audio.key.wrong);
+                Helpers.playSound(scene, wrong);
                 return; // ⬅️ stop here
             }
         }

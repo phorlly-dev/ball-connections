@@ -49,19 +49,25 @@ const Payloads = {
         const gameWidth = scene.scale.width;
         const gameHeight = scene.scale.height;
 
-        // Increase difficulty by adding more colors over time
-        const numColors = Math.min(3 + Math.floor(level / 10), colors.length);
+        // --- Random 3–5 colors each level ---
+        const numColors = Phaser.Math.Between(3, 5);
         States.setSubtitle(numColors);
 
-        // Balls per color also increases with levels (max 4 per color)
+        // --- Balls per color (max 4) ---
         const ballsPerColor = Math.min(2 + Math.floor(level / 20), 4);
 
-        scene.totalBalls = numColors * ballsPerColor;
+        // --- Limit total balls by screen size ---
+        const maxBalls = Math.floor((gameWidth * gameHeight) / (scene.ballRadius * 8 * scene.ballRadius));
+        scene.totalBalls = Math.min(numColors * ballsPerColor, maxBalls);
+
         const minDistance = scene.ballRadius * 3 + 5;
         const margin = scene.ballRadius * 2;
 
-        // Minimum distance between same-color balls (scales with level)
-        const sameColorMinDistance = Math.max(gameWidth, gameHeight) / (2.5 + Math.floor(level / 8));
+        // --- Adaptive spacing rule ---
+        const sameColorMinDistance = Math.max(
+            scene.ballRadius * 4,
+            Math.max(gameWidth, gameHeight) / (2.5 + Math.floor(level / 8))
+        );
 
         let positions = [];
         let ballConfig = [];
@@ -71,8 +77,8 @@ const Payloads = {
             positions = [];
             attempts = 0;
 
-            // random positions with spacing
-            while (positions.length < scene.totalBalls && attempts < 2000) {
+            // --- Generate random positions ---
+            while (positions.length < scene.totalBalls && attempts < 5000) {
                 const x = Phaser.Math.Between(margin, gameWidth - margin);
                 const y = Phaser.Math.Between(margin, gameHeight - margin);
 
@@ -88,28 +94,32 @@ const Payloads = {
                 attempts++;
             }
 
-            // assign colors
+            // --- Assign colors safely ---
             ballConfig = [];
             const availableColors = [...colors];
             Phaser.Utils.Array.Shuffle(positions);
+
+            if (positions.length < scene.totalBalls) continue; // retry
 
             for (let i = 0; i < numColors; i++) {
                 const color = availableColors[i];
 
                 for (let j = 0; j < ballsPerColor; j++) {
                     const idx = i * ballsPerColor + j;
+                    if (!positions[idx]) continue;
 
-                    // check same-color distance rule
+                    // enforce same-color spacing
                     if (j > 0) {
                         const partner = ballConfig.find((b) => b.color === color.key);
-                        const dist = Phaser.Math.Distance.Between(
-                            positions[idx].x,
-                            positions[idx].y,
-                            partner.x,
-                            partner.y
-                        );
-                        if (dist < sameColorMinDistance) {
-                            continue; // reject placement → regen in outer loop
+                        if (partner) {
+                            const dist = Phaser.Math.Distance.Between(
+                                positions[idx].x,
+                                positions[idx].y,
+                                partner.x,
+                                partner.y
+                            );
+
+                            if (dist < sameColorMinDistance) continue;
                         }
                     }
 

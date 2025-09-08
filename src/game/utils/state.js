@@ -16,7 +16,7 @@ const States = {
         this.getById("score").textContent = score;
     },
     setSubtitle(counter) {
-        this.getById("subtile").textContent = counter;
+        return (this.getById("subtile").textContent = counter);
     },
     playConnectEffect(scene, { startBall, endBall, color }) {
         // Pulse balls

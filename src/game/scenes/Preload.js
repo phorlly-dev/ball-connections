@@ -25,7 +25,7 @@ class Preload extends Phaser.Scene {
         Payloads.toggleUI(false);
 
         // --- Background ---
-        this.bg = this.add.image(width / 2, height / 2, Instances.image.key.bg).setAlpha(0.2);
+        this.bg = this.add.image(width / 2, height / 2, Instances.image.key.bg).setAlpha(0.4);
 
         // --- Sizes (responsive bar width = 40% of screen) ---
         const barWidth = Math.min(300, width * 0.4);
@@ -57,6 +57,11 @@ class Preload extends Phaser.Scene {
 
         this.load.once("complete", () => {
             this.targetProgress = 1;
+
+            // // ✅ unlock audio context (important for mobile)
+            // if (this.sound.context.state === "suspended") {
+            //     this.sound.context.resume();
+            // }
 
             // Fade out everything nicely
             this.tweens.add({

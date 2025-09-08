@@ -80,7 +80,7 @@ body {
 
 /* When dragging/drawing */
 #phaser-game.drawing canvas {
-    cursor: url("/pencil.png") 0 12, cell !important;
+    cursor: cell;
 }
 
 .controls {

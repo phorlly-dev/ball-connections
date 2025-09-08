@@ -91,7 +91,7 @@ const Controllers = {
         if (Phaser.Math.Distance.BetweenPoints(newPoint, lastPoint) <= 12) return;
 
         const newSegment = new Phaser.Geom.Line(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y);
-        const margin = 16;
+        const margin = 12;
 
         // --- Prevent drawing outside game area ---
         if (

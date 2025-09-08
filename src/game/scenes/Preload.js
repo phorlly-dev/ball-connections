@@ -58,10 +58,10 @@ class Preload extends Phaser.Scene {
         this.load.once("complete", () => {
             this.targetProgress = 1;
 
-            // // ✅ unlock audio context (important for mobile)
-            // if (this.sound.context.state === "suspended") {
-            //     this.sound.context.resume();
-            // }
+            // ✅ unlock audio context (important for mobile)
+            if (this.sound.context.state === "suspended") {
+                this.sound.context.resume();
+            }
 
             // Fade out everything nicely
             this.tweens.add({

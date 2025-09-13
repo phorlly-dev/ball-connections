@@ -3,6 +3,9 @@ const Instances = {
         width: 400,
         height: 420,
         bg: "#f8f9fa",
+        boot: "boot",
+        preload: "preload",
+        start: "start",
     },
     text: {
         status: "Draw flexible lines to connect same colors!",
@@ -47,4 +50,6 @@ const Instances = {
     ],
 };
 
-export default Instances;
+export const { game, text, image, audio, colors } = Instances;
+export const { width, height, bg, boot, preload, start } = game;
+export const { status, hintText } = text;

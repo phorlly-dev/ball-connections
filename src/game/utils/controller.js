@@ -1,52 +1,45 @@
-import Instances from "../consts";
-import Helpers from "./helper";
-import Payloads from "./payload";
-import States from "./state";
+import { audio, status } from "../consts";
+import { cancelCurrentPath, disconnectPath, playSound, toggleDrawingCursor } from "./helper";
+import { checkCompletion, drawAllPaths, getBallAt, initLevel, toggleSound, updateBallStyle } from "./payload";
+import { bindToggleButtons, getById, setDelay, setStatus } from "./state";
 
-const { click, empty, wrong } = Instances.audio.key;
-const { status, hintText } = Instances.text;
 const Controllers = {
-    buttons(scene) {
+    makebuttons(scene) {
         // clear old listeners before binding new
-        const elements = [
-            States.getById("reset-btn"),
-            States.getById("hint-btn"),
-            States.getById("on-btn"),
-            States.getById("off-btn"),
-        ];
+        const elements = [getById("reset-btn"), getById("hint-btn"), getById("on-btn"), getById("off-btn")];
 
         elements.forEach((el) => {
             el.replaceWith(el.cloneNode(true)); // 🔑 remove old listeners
         });
 
-        scene.resetBtn = States.getById("reset-btn");
-        scene.hintBtn = States.getById("hint-btn");
-        scene.onBtn = States.getById("on-btn");
-        scene.offBtn = States.getById("off-btn");
+        scene.resetBtn = getById("reset-btn");
+        scene.hintBtn = getById("hint-btn");
+        scene.onBtn = getById("on-btn");
+        scene.offBtn = getById("off-btn");
 
         scene.resetBtn.addEventListener("click", () => {
-            Payloads.initLevel(scene, scene.currentLevel);
-            Helpers.playSound(scene, click);
+            initLevel(scene, scene.currentLevel);
+            playSound(scene, audio.key.click);
         });
         scene.hintBtn.addEventListener("click", () => {
-            States.setStatus(hintText);
-            Helpers.playSound(scene, click);
-            States.setDelay({ scene, callback: () => States.setStatus(status) });
+            setStatus(hintText);
+            playSound(scene, audio.key.click);
+            setDelay({ scene, callback: () => setStatus(status) });
         });
     },
     toggleMute(scene) {
-        States.bindToggleButtons({
+        bindToggleButtons({
             scene,
             elements: [scene.onBtn, scene.offBtn],
-            callback: Payloads.toggleSound,
+            callback: toggleSound,
         });
     },
-    handlePointerUp(scene, pointer) {
-        Helpers.toggleDrawingCursor(false);
+    pointerUp(scene, pointer) {
+        toggleDrawingCursor(false);
         if (!scene.isDragging || !scene.currentPath) return;
 
         scene.isDragging = false;
-        const endBall = Payloads.getBallAt(scene, pointer.x, pointer.y);
+        const endBall = getBallAt(scene, pointer.x, pointer.y);
 
         // ✅ Correct connection
         if (
@@ -65,10 +58,10 @@ const Controllers = {
             endBall.connected = true;
             endBall.connectedTo = scene.currentPath.startBall;
 
-            Payloads.updateBallStyle(scene.currentPath.startBall);
-            Payloads.updateBallStyle(endBall);
+            updateBallStyle(scene.currentPath.startBall);
+            updateBallStyle(endBall);
 
-            Payloads.checkCompletion(scene, {
+            checkCompletion(scene, {
                 startBall: scene.currentPath.startBall,
                 endBall,
                 color: scene.currentPath.color,
@@ -76,14 +69,14 @@ const Controllers = {
         }
 
         scene.currentPath = null;
-        Payloads.drawAllPaths(scene);
-        States.setDelay({
+        drawAllPaths(scene);
+        setDelay({
             scene,
             delay: 5000,
-            callback: () => States.setStatus(status),
+            callback: () => setStatus(status),
         });
     },
-    handlePointerMove(scene, pointer) {
+    pointerMove(scene, pointer) {
         if (!scene.isDragging || !scene.currentPath) return;
 
         const newPoint = new Phaser.Math.Vector2(pointer.x, pointer.y);
@@ -100,8 +93,8 @@ const Controllers = {
             newPoint.y < margin ||
             newPoint.y > scene.sys.game.config.height - margin
         ) {
-            Helpers.cancelCurrentPath(scene, "❌ Cannot hit the boundary!");
-            Helpers.playSound(scene, empty);
+            cancelCurrentPath(scene, "❌ Cannot hit the boundary!");
+            playSound(scene, audio.key.empty);
             return; // ⬅️ stop here
         }
 
@@ -119,8 +112,8 @@ const Controllers = {
                 Phaser.Geom.Rectangle.Inflate(rect, margin, margin);
 
                 if (Phaser.Geom.Intersects.LineToRectangle(newSegment, rect)) {
-                    Helpers.cancelCurrentPath(scene, "❌ Cannot cross another path!");
-                    Helpers.playSound(scene, wrong);
+                    cancelCurrentPath(scene, "❌ Cannot cross another path!");
+                    playSound(scene, audio.key.wrong);
                     return; // ⬅️ stop here
                 }
             }
@@ -137,24 +130,24 @@ const Controllers = {
 
             // ❌ Only block if different color and touching
             if (!isPartner && Phaser.Geom.Intersects.LineToCircle(newSegment, ballCircle)) {
-                Helpers.cancelCurrentPath(scene, "❌ Cannot pass through a different-colored ball!");
-                Helpers.playSound(scene, wrong);
+                cancelCurrentPath(scene, "❌ Cannot pass through a different-colored ball!");
+                playSound(scene, audio.key.wrong);
                 return; // ⬅️ stop here
             }
         }
 
         // --- If valid, push new point ---
         scene.currentPath.points.push(newPoint);
-        Payloads.drawAllPaths(scene);
+        drawAllPaths(scene);
     },
-    handlePointerDown(scene, pointer) {
-        Helpers.toggleDrawingCursor(true);
-        const clickedBall = Payloads.getBallAt(scene, pointer.x, pointer.y);
+    pointerDown(scene, pointer) {
+        toggleDrawingCursor(true);
+        const clickedBall = getBallAt(scene, pointer.x, pointer.y);
         if (!clickedBall) return;
 
         // --- NEW: Disconnect if already connected ---
         if (clickedBall.connected) {
-            Helpers.disconnectPath(scene, clickedBall);
+            disconnectPath(scene, clickedBall);
             return;
         }
 
@@ -164,7 +157,7 @@ const Controllers = {
 
             // If scene ball's partner was already connected, break that path
             const partner = scene.balls.find((b) => b.colorKey === clickedBall.colorKey && b.id !== clickedBall.id);
-            if (partner && partner.connected) Helpers.disconnectPath(scene, partner);
+            if (partner && partner.connected) disconnectPath(scene, partner);
 
             scene.paths = scene.paths.filter((path) => path.startBall.colorKey !== clickedBall.colorKey);
             scene.currentPath = {
@@ -174,9 +167,9 @@ const Controllers = {
                 completed: false,
             };
 
-            Payloads.drawAllPaths(scene);
+            drawAllPaths(scene);
         }
     },
 };
 
-export default Controllers;
+export const { makebuttons, toggleMute, pointerUp, pointerMove, pointerDown } = Controllers;

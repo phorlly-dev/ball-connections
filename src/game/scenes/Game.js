@@ -1,10 +1,10 @@
-import Instances from "../consts";
-import Controllers from "../utils/controller";
-import Payloads from "../utils/payload";
+import { audio, start } from "../consts";
+import { makebuttons, pointerDown, pointerMove, pointerUp, toggleMute } from "../utils/controller";
+import { initLevel, toggleUI } from "../utils/payload";
 
 class GameEngine extends Phaser.Scene {
     constructor() {
-        super("GameEngine");
+        super(start);
 
         // Declare properties
         this.balls = [];
@@ -24,7 +24,7 @@ class GameEngine extends Phaser.Scene {
     }
 
     init() {
-        Payloads.toggleUI();
+        toggleUI();
 
         // Reset state each time scene starts
         this.balls = [];
@@ -41,14 +41,14 @@ class GameEngine extends Phaser.Scene {
         this.lineGraphics = this.add.graphics();
 
         // --- Setup game level ---
-        Payloads.initLevel(this, this.currentLevel);
+        initLevel(this, this.currentLevel);
 
         // --- Controllers / UI ---
-        Controllers.buttons(this);
-        Controllers.toggleMute?.(this); // safer check if function exists
+        makebuttons(this);
+        toggleMute?.(this); // safer check if function exists
 
         // --- Audio ---
-        this.sound.play(Instances.audio.key.bg, { loop: true, volume: 0.5 });
+        this.sound.play(audio.key.bg, { loop: true, volume: 0.5 });
 
         // --- Input listeners (once, not per frame) ---
         this.input.on("pointerdown", this.handlePointerDown, this);
@@ -58,15 +58,15 @@ class GameEngine extends Phaser.Scene {
 
     // --- INPUT HANDLING ---
     handlePointerDown(pointer) {
-        Controllers.handlePointerDown(this, pointer);
+        pointerDown(this, pointer);
     }
 
     handlePointerMove(pointer) {
-        Controllers.handlePointerMove(this, pointer);
+        pointerMove(this, pointer);
     }
 
     handlePointerUp(pointer) {
-        Controllers.handlePointerUp(this, pointer);
+        pointerUp(this, pointer);
     }
 
     // --- Cleanup when scene stops ---

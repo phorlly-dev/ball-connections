@@ -1,17 +1,17 @@
-import Instances from "../consts";
+import { boot, image, preload } from "../consts";
 
 class Boot extends Phaser.Scene {
     constructor() {
-        super("Boot");
+        super(boot);
     }
 
     preload() {
         this.load.setPath("assets");
-        this.load.image(Instances.image.key.bg, Instances.image.value.bg);
+        this.load.image(image.key.bg, image.value.bg);
     }
 
     create() {
-        this.scene.start("Preload");
+        this.scene.start(preload);
     }
 }
 

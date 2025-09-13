@@ -1,22 +1,22 @@
-import Instances from "../consts";
+import { colors } from "../consts";
 
 const States = {
     getById(id) {
         return document.getElementById(id);
     },
     setStatus(message, className = "") {
-        const status = this.getById("status");
+        const status = getById("status");
         status.textContent = message;
         status.className = `status ${className}`;
     },
     setTitle(level) {
-        this.getById("title").textContent = level;
+        getById("title").textContent = level;
     },
     setPoints(score) {
-        this.getById("score").textContent = score;
+        getById("score").textContent = score;
     },
     setSubtitle(counter) {
-        return (this.getById("subtile").textContent = counter);
+        getById("subtile").textContent = counter;
     },
     playConnectEffect(scene, { startBall, endBall, color }) {
         // Pulse balls
@@ -99,9 +99,9 @@ const States = {
             blendMode: "ADD",
         };
 
-        Instances.colors.forEach((c) => {
+        colors.forEach((c) => {
             const emitter = scene.add.particles(0, 0, `particle_${c.key}`, emitterConfig);
-            this.setDelay({
+            setDelay({
                 scene,
                 callback: () => {
                     emitter.stop();
@@ -115,4 +115,14 @@ const States = {
     },
 };
 
-export default States;
+export const {
+    getById,
+    setStatus,
+    setTitle,
+    setPoints,
+    setSubtitle,
+    playConnectEffect,
+    setDelay,
+    playLevelCompleteEffect,
+    bindToggleButtons,
+} = States;

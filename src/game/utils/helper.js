@@ -1,13 +1,13 @@
-import Instances from "../consts";
-import Payloads from "./payload";
-import States from "./state";
+import { audio, status } from "../consts";
+import { drawAllPaths, updateBallStyle } from "./payload";
+import { getById, setDelay, setPoints, setStatus } from "./state";
 
 const Helpers = {
     hide({ id = "", element = null }) {
-        return element ? element.classList.add("hidden") : States.getById(id).classList.add("hidden");
+        return element ? element.classList.add("hidden") : getById(id).classList.add("hidden");
     },
     show({ id = "", element = null }) {
-        return element ? element.classList.remove("hidden") : States.getById(id).classList.remove("hidden");
+        return element ? element.classList.remove("hidden") : getById(id).classList.remove("hidden");
     },
     playSound(scene, key) {
         if (scene.sound.locked) {
@@ -27,7 +27,7 @@ const Helpers = {
         scene.lineGraphics.lineStyle(4, 0xffffff, 0.8).strokePoints(path.points);
     },
     cancelCurrentPath(scene, message) {
-        States.setStatus(message, "error");
+        setStatus(message, "error");
 
         // Remove current path instantly
         scene.isDragging = false;
@@ -38,14 +38,14 @@ const Helpers = {
         scene.paths.forEach((path) => {
             if (path.completed) {
                 // redraw completed paths only
-                this.drawPath(scene, path);
+                drawPath(scene, path);
             }
         });
 
-        States.setDelay({
+        setDelay({
             scene,
             delay: 5000,
-            callback: () => States.setStatus(Instances.text.status),
+            callback: () => setStatus(status),
         });
     },
     isTooEasy(config) {
@@ -72,12 +72,12 @@ const Helpers = {
             // Reset both balls
             path.startBall.connected = false;
             path.startBall.connectedTo = null;
-            Payloads.updateBallStyle(path.startBall);
+            updateBallStyle(path.startBall);
 
             if (path.endBall) {
                 path.endBall.connected = false;
                 path.endBall.connectedTo = null;
-                Payloads.updateBallStyle(path.endBall);
+                updateBallStyle(path.endBall);
             }
 
             // Remove the path
@@ -85,11 +85,11 @@ const Helpers = {
 
             // Redraw
             scene.lineGraphics.clear();
-            Payloads.drawAllPaths(scene);
-            this.setOrCutScore(scene, scene.totalBalls, false);
-            Helpers.playSound(scene, Instances.audio.key.cancel);
+            drawAllPaths(scene);
+            setOrCutScore(scene, scene.totalBalls, false);
+            playSound(scene, audio.key.cancel);
 
-            States.setStatus("🔄 Connection removed!");
+            setStatus("🔄 Connection removed!");
         }
     },
     setOrCutScore(scene, points, positive = true) {
@@ -99,11 +99,21 @@ const Helpers = {
             scene.currentScore -= points;
         }
 
-        States.setPoints(scene.currentScore);
+        setPoints(scene.currentScore);
     },
     toggleDrawingCursor(enable) {
-        States.getById("phaser-game").classList.toggle("drawing", enable);
+        getById("phaser-game").classList.toggle("drawing", enable);
     },
 };
 
-export default Helpers;
+export const {
+    hide,
+    show,
+    playSound,
+    drawPath,
+    cancelCurrentPath,
+    isTooEasy,
+    disconnectPath,
+    setOrCutScore,
+    toggleDrawingCursor,
+} = Helpers;

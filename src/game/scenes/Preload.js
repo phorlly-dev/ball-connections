@@ -1,9 +1,9 @@
-import Instances from "../consts";
-import Payloads from "../utils/payload";
+import { audio, image, preload, start } from "../consts";
+import { toggleUI } from "../utils/payload";
 
 class Preload extends Phaser.Scene {
     constructor() {
-        super("Preload");
+        super(preload);
 
         // Declare props
         this.fakeProgress = 0;
@@ -22,10 +22,10 @@ class Preload extends Phaser.Scene {
 
     preload() {
         const { width, height } = this.scale;
-        Payloads.toggleUI(false);
+        toggleUI(false);
 
         // --- Background ---
-        this.bg = this.add.image(width / 2, height / 2, Instances.image.key.bg).setAlpha(0.4);
+        this.bg = this.add.image(width / 2, height / 2, image.key.bg).setAlpha(0.4);
 
         // --- Sizes (responsive bar width = 40% of screen) ---
         const barWidth = Math.min(300, width * 0.4);
@@ -69,13 +69,13 @@ class Preload extends Phaser.Scene {
                 alpha: 0,
                 duration: 500,
                 onComplete: () => {
-                    this.scene.start("GameEngine");
+                    this.scene.start(start);
                 },
             });
         });
 
         // --- Example assets ---
-        const { key, value } = Instances.audio;
+        const { key, value } = audio;
         this.load.setPath("assets");
         this.load.audio(key.bg, value.bg);
         this.load.audio(key.cancel, value.cancel);

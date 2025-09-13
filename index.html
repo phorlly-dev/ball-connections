@@ -1,52 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="/style.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+        <title>Ball Connections</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <title>Ball Connections</title>
-</head>
+    <body>
+        <div class="game-container">
+            <header class="header container hidden mb-2" id="header">
+                <div class="row align-items-center">
+                    <!-- Left: Score -->
+                    <section class="col-12 col-md-4 text-md-start mb-2 mb-md-0">
+                        <h2 class="h6 mb-0">
+                            <span class="text-success fw-bold">Score:</span>
+                            <span id="score" class="fw-bold text-dark">0</span>
+                        </h2>
+                    </section>
 
-<body>
-    <div class="game-container">
-        <div class="header hidden" id="header">
-            <h2>Score: <span class="high title" id="score">0</span></h2>
-            <h1>Level <span class="high title" id="title">1</span></h1>
+                    <!-- Center: Level -->
+                    <section class="col-12 col-md-4 text-center mb-2 mb-md-0">
+                        <h1 class="h5 mb-0 text-muted">Level <span id="title" class="fw-bold">1</span></h1>
+                    </section>
 
-            <button id="on-btn" class="control-btn volume">
-                <i class="fa fa-volume-up" aria-hidden="true"></i>
-            </button>
-            <button id="off-btn" class="control-btn volume muted hidden">
-                <i class="fa fa-volume-mute" aria-hidden="true"></i>
-            </button>
+                    <!-- Right section -->
+                    <section class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end">
+                        <!-- Sound On -->
+                        <button id="on-btn" class="control-btn volume rounded-circle" title="Sound On">
+                            <i class="fa fa-volume-up" aria-hidden="true"></i>
+                        </button>
+                        <!-- Sound Off -->
+                        <button id="off-btn" class="control-btn volume muted hidden rounded-circle" title="Sound Off">
+                            <i class="fa fa-volume-mute" aria-hidden="true"></i>
+                        </button>
+                    </section>
+                </div>
+            </header>
+
+            <main class="phaser-wrapper">
+                <section id="phaser-game"></section>
+            </main>
+
+            <footer class="game-footer hidden mt-2" id="footer">
+                <section id="level-info" class="title">
+                    Draw curved lines • Connect same colors • <span id="subtile">3</span> colors
+                </section>
+
+                <section class="controls">
+                    <button id="hint-btn" class="control-btn hint-btn rounded-circle" title="View Info">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                    </button>
+                    <button id="reset-btn" class="control-btn reset-btn rounded-circle" title="Reset Game">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </button>
+                </section>
+
+                <div id="status" class="status title">Draw flexible lines to connect same colors!</div>
+            </footer>
         </div>
-
-        <div class="phaser-wrapper">
-            <div id="phaser-game"></div>
-        </div>
-
-        <div class="game-footer hidden" id="footer">
-            <div id="level-info" class="title">
-                Draw curved lines • Connect same colors • <span id="subtile">3</span> colors
-            </div>
-
-            <div class="controls">
-                <button id="hint-btn" class="control-btn hint-btn">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                </button>
-                <button id="reset-btn" class="control-btn reset-btn">
-                    <i class="fa fa-refresh" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div id="status" class="status title">Draw flexible lines to connect same colors!</div>
-        </div>
-    </div>
-    <script type="module" src="src/main.js"></script>
-</body>
-
+        <script type="module" src="src/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>

@@ -1,12 +1,12 @@
 import * as Phaser from "phaser";
 import GameEngine from "./scenes/Game";
-import Instances from "./consts";
 import Boot from "./scenes/Boot";
 import Preload from "./scenes/Preload";
+import { bg, height, width } from "./consts";
 
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
-const { width, height, bg } = Instances.game;
+
 const config = {
     type: Phaser.AUTO,
     width: width,

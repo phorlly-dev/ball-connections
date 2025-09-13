@@ -1,14 +1,19 @@
-import Instances from "../consts";
-import Helpers from "./helper";
-import States from "./state";
+import { audio, colors, status } from "../consts";
+import { drawPath, hide, isTooEasy, playSound, setOrCutScore, show } from "./helper";
+import {
+    getById,
+    playConnectEffect,
+    playLevelCompleteEffect,
+    setDelay,
+    setStatus,
+    setSubtitle,
+    setTitle,
+} from "./state";
 
-const { status } = Instances.text;
-const { click, connect, win } = Instances.audio.key;
-const { colors } = Instances;
 const Payloads = {
     initLevel(scene, level) {
         scene.currentLevel = level;
-        States.setTitle(level);
+        setTitle(level);
 
         scene.balls.forEach((ball) => ball.destroy());
         scene.balls = [];
@@ -17,7 +22,7 @@ const Payloads = {
         scene.currentPath = null;
         scene.lineGraphics.clear();
 
-        const levelConfig = this.generateLevelConfig(scene, level);
+        const levelConfig = generateLevelConfig(scene, level);
 
         levelConfig.balls.forEach((config) => {
             const colorInfo = colors.find((c) => c.key === config.color);
@@ -43,15 +48,15 @@ const Payloads = {
             scene.balls.push(ballContainer);
         });
 
-        States.setStatus(status);
+        setStatus(status);
     },
     generateLevelConfig(scene, level) {
         const gameWidth = scene.scale.width;
         const gameHeight = scene.scale.height;
 
-        // --- Random 3–5 colors each level ---
-        const numColors = Phaser.Math.Between(3, 5);
-        States.setSubtitle(numColors);
+        // --- Random 3–4 colors each level ---
+        const numColors = Phaser.Math.Between(3, 4);
+        setSubtitle(numColors);
 
         // --- Balls per color (max 4) ---
         const ballsPerColor = Math.min(2 + Math.floor(level / 20), 4);
@@ -131,28 +136,28 @@ const Payloads = {
                     });
                 }
             }
-        } while (ballConfig.length < scene.totalBalls || Helpers.isTooEasy(ballConfig));
+        } while (ballConfig.length < scene.totalBalls || isTooEasy(ballConfig));
 
         return { balls: ballConfig };
     },
     checkCompletion(scene, { startBall, endBall, color }) {
         if (scene.balls.every((ball) => ball.connected)) {
-            States.setStatus(`🎉 Level ${scene.currentLevel} Complete!`, "completed");
-            Helpers.playSound(scene, win);
-            States.playLevelCompleteEffect(scene, scene.currentLevel);
-            Helpers.setOrCutScore(scene, scene.totalBalls);
-            States.setDelay({ scene, callback: () => this.initLevel(scene, scene.currentLevel + 1) });
+            setStatus(`🎉 Level ${scene.currentLevel} Complete!`, "completed");
+            playSound(scene, audio.key.win);
+            playLevelCompleteEffect(scene, scene.currentLevel);
+            setOrCutScore(scene, scene.totalBalls);
+            setDelay({ scene, callback: () => initLevel(scene, scene.currentLevel + 1) });
         } else {
-            States.setStatus("✅ Great connection!");
-            Helpers.setOrCutScore(scene, scene.totalBalls);
-            Helpers.playSound(scene, connect);
-            States.playConnectEffect(scene, { startBall, endBall, color });
+            setStatus("✅ Great connection!");
+            setOrCutScore(scene, scene.totalBalls);
+            playSound(scene, audio.key.connect);
+            playConnectEffect(scene, { startBall, endBall, color });
         }
     },
     drawAllPaths(scene) {
         scene.lineGraphics.clear();
         const allPaths = scene.currentPath ? [...scene.paths, scene.currentPath] : scene.paths;
-        allPaths.forEach((path) => Helpers.drawPath(scene, path));
+        allPaths.forEach((path) => drawPath(scene, path));
     },
     getBallAt(scene, x, y) {
         return scene.balls.find((ball) => Phaser.Math.Distance.Between(x, y, ball.x, ball.y) < scene.ballRadius);
@@ -161,34 +166,43 @@ const Payloads = {
         ball.mainCircle.setStrokeStyle(ball.connected ? 4 : 3, ball.connected ? 0x2c3e50 : 0xbdc3c7);
     },
     toggleUI(isVisible = true) {
-        const header = States.getById("header");
-        const footer = States.getById("footer");
+        const header = getById("header");
+        const footer = getById("footer");
 
         if (isVisible) {
-            Helpers.show({ element: header });
-            Helpers.show({ element: footer });
+            show({ element: header });
+            show({ element: footer });
         } else {
-            Helpers.hide({ element: header });
-            Helpers.hide({ element: footer });
+            hide({ element: header });
+            hide({ element: footer });
         }
     },
     toggleSound(scene) {
         // Start with muted = false
         scene.sound.mute = false;
-        Helpers.playSound(scene, click);
+        playSound(scene, audio.key.click);
 
         if (scene.sound.mute) {
             // Unmute
             scene.sound.mute = false;
-            Helpers.show({ element: scene.onBtn });
-            Helpers.hide({ element: scene.offBtn });
+            show({ element: scene.onBtn });
+            hide({ element: scene.offBtn });
         } else {
             // Mute
             scene.sound.mute = true;
-            Helpers.hide({ element: scene.onBtn });
-            Helpers.show({ element: scene.offBtn });
+            hide({ element: scene.onBtn });
+            show({ element: scene.offBtn });
         }
     },
 };
 
-export default Payloads;
+export const {
+    initLevel,
+    generateLevelConfig,
+    checkCompletion,
+    drawAllPaths,
+    getBallAt,
+    updateBallStyle,
+    toggleUI,
+    toggleSound,
+} = Payloads;

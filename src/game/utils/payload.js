@@ -58,8 +58,8 @@ const Payloads = {
         const numColors = Phaser.Math.Between(3, 4);
         setSubtitle(numColors);
 
-        // --- Balls per color (max 4) ---
-        const ballsPerColor = Math.min(2 + Math.floor(level / 20), 4);
+        // --- Balls per color (max 2) ---
+        const ballsPerColor = Math.min(2 + Math.floor(level / 24), 2);
 
         // --- Limit total balls by screen size ---
         const maxBalls = Math.floor((gameWidth * gameHeight) / (scene.ballRadius * 8 * scene.ballRadius));
@@ -83,7 +83,7 @@ const Payloads = {
             attempts = 0;
 
             // --- Generate random positions ---
-            while (positions.length < scene.totalBalls && attempts < 5000) {
+            while (positions.length < scene.totalBalls && attempts < 6000) {
                 const x = Phaser.Math.Between(margin, gameWidth - margin);
                 const y = Phaser.Math.Between(margin, gameHeight - margin);
 

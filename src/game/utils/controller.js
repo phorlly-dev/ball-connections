@@ -1,4 +1,4 @@
-import { audio, status } from "../consts";
+import { audio, hintText, status } from "../consts";
 import { cancelCurrentPath, disconnectPath, playSound, toggleDrawingCursor } from "./helper";
 import { checkCompletion, drawAllPaths, getBallAt, initLevel, toggleSound, updateBallStyle } from "./payload";
 import { bindToggleButtons, getById, setDelay, setStatus } from "./state";
